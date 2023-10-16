@@ -44,7 +44,17 @@ export const appRouter = router({
     .mutation(async ({ ctx, input }) => {
       const { userId } = ctx
 
-      const file = await db.file.findFirst({ where: { id: input.id } })
+      const file = await db.file.findFirst({ where: { id: input.id, userId } })
+
+      if (!file) throw new TRPCError({ code: 'NOT_FOUND' })
+
+      await db.file.delete({
+        where: {
+          id: input.id,
+        },
+      })
+
+      return file
     }),
 })
 
